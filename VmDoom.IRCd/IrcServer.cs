@@ -1,6 +1,6 @@
 ﻿using Akka;
 using Akka.Actor;
-
+using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,46 +19,72 @@ namespace VmDoom.IRCd
 
     public class IrcMessage
     {
-        public Prefix Prefix { get; private set; }
+        public IrcMessage()
+        {
+        }
+
+        public string Command { get; set; }
+
+        public User User { get; private set; }
+        
+        public Newnick Newnick { get; private set; }    
+        
+        public Prefix Prefix { get; set; }
+    }
+
+    public class Parser
+    {
+        public IrcMessage TryParse(string input)
+        {
+            //Parser<string> servername = 
+            //    Parse.Letter.AtLeastOnce().Text().Token();
+
+            //Parser<string> nick =
+            //    Parse.Letter.AtLeastOnce().Text().Token();
+
+           Parser<string> servername =
+                (from letters in Parse.Letter.Many().Text()
+                 select letters).Token();
+
+            Parser<string> nick =
+                (from letters in Parse.LetterOrDigit.AtLeastOnce().Text()
+                 select letters).Token();
+
+            Parser<Prefix> prefix =
+                from s in servername
+                from n in nick
+                select new Prefix(s, n);
+
+            return new IrcMessage
+            {
+                Prefix = prefix.Parse(input)
+            };
+        }
     }
 
     public class Prefix
     {
+        public Prefix(string servername, string nick)
+        {
+            Servername = servername;
+            Nick = nick;
+        }
+
         public string Servername { get; private set; }
+        public string Nick { get; private set; }
     }
-    // server
-    //
-    // connect NICK/USER
 
-// <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
-// <prefix>   ::= <servername> | <nick> [ '!' <user> ]
-//    [ '@' <host> ]
-// <command>  ::= <letter> { <letter> } | <number> <number> <number>
-// <SPACE>    ::= ' ' { ' ' }
-// <params>   ::= <SPACE> [ ':' <trailing> | <middle> <params> ]
-// <middle>   ::= <Any* non-empty* sequence of octets not including SPACE or NUL or CR or LF, the first of which may not be ':'>
-// <trailing> ::= <Any, possibly* empty*, sequence of octets not including NUL or CR or LF>
-// <crlf>     ::= CR LF
+    public class User
+    {
+        public string Host { get; set; }
+        public string Nickname { get; set; }
+        public string Username { get; set; }
+        public string Realname { get; set; }
+    }
+
+    public class Newnick
+    {
+        public string Old { get; set; }
+        public string New { get; set; }
+    }
 }
-
-//class Program
-//{
-//    static void Main(string[] args)
-//    {
-//        // Create a new actor system (a container for your actors)
-//        var system = ActorSystem.Create("MySystem");
-
-//        // Create your actor and get a reference to it.
-//        // This will be an "ActorRef", which is not a
-//        // reference to the actual actor instance
-//        // but rather a client or proxy to it.
-//        var greeter = system.ActorOf<GreetingActor>("greeter");
-
-//        // Send a message to the actor
-//        greeter.Tell(new Greet("World"));
-
-//        // This prevents the app from exiting
-//        // before the async work is done
-//        Console.ReadLine();
-//    }
-//}

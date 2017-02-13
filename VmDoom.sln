@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VmDoom.IRCd", "VmDoom.IRCd\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VmDoom.WebApp", "VmDoom.WebApp\VmDoom.WebApp.csproj", "{320DD6E6-858D-466B-9737-4BF777832FA8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionRootFiles", "SolutionRootFiles", "{324BF028-9A6F-4AB7-986F-AA4C647ECD42}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VmDoom.IRCd.UnitTests", "VmDoom.IRCd.UnitTests\VmDoom.IRCd.UnitTests.csproj", "{CDB539D4-0E25-4957-B5DC-083B5C2F15C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +28,10 @@ Global
 		{320DD6E6-858D-466B-9737-4BF777832FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{320DD6E6-858D-466B-9737-4BF777832FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{320DD6E6-858D-466B-9737-4BF777832FA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDB539D4-0E25-4957-B5DC-083B5C2F15C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDB539D4-0E25-4957-B5DC-083B5C2F15C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDB539D4-0E25-4957-B5DC-083B5C2F15C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDB539D4-0E25-4957-B5DC-083B5C2F15C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
