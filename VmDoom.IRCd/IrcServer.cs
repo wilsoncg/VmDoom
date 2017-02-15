@@ -32,6 +32,23 @@ namespace VmDoom.IRCd
         public Prefix Prefix { get; set; }
     }
 
+    public class MapCommand
+    {
+        public MapCommand(string command)
+        {
+            if (command.ToUpper() == "NICK")
+                Command = Command.Nick;
+        }
+
+        public Command Command { get; private set; }
+    }
+
+    public enum Command
+    {
+        Unknown,
+        Nick
+    }
+
     public class Parser
     {
         public IrcMessage TryParse(string input)
@@ -42,18 +59,33 @@ namespace VmDoom.IRCd
             //Parser<string> nick =
             //    Parse.Letter.AtLeastOnce().Text().Token();
 
-           Parser<string> servername =
+            Parser<char> Colon = Parse.Char(':');
+
+            Parser<string> serverOrNick =
                 (from letters in Parse.Letter.Many().Text()
                  select letters).Token();
 
-            Parser<string> nick =
-                (from letters in Parse.LetterOrDigit.AtLeastOnce().Text()
-                 select letters).Token();
-
             Parser<Prefix> prefix =
-                from s in servername
-                from n in nick
-                select new Prefix(s, n);
+                Colon.Then(_ => 
+                    (from s in serverOrNick
+                     select new Prefix(s)));
+
+            Parser<string> numCommand = 
+                Parse.Digit.AtLeastOnce().Text().Token();
+            Parser<string> textCommand =
+                Parse.Letter.Many().Text().Token();
+
+            //Parser<Command> command =
+            //    prefix
+            //    .Then(p => Parse.Return(Command.Unknown))
+            //        .Return(numCommand)
+            //    .Or(_ => textCommand)
+            //        .Return(new MapCommand(textCommand).Command)
+
+            Parser<Command> command =
+                numCommand.Return(Command.Unknown)
+                .Or(new MapCommand(textCommand).Command)
+                
 
             return new IrcMessage
             {
@@ -64,14 +96,12 @@ namespace VmDoom.IRCd
 
     public class Prefix
     {
-        public Prefix(string servername, string nick)
+        public Prefix(string servernameORnick)
         {
-            Servername = servername;
-            Nick = nick;
+            ServernameOrNick = servernameORnick;
         }
 
-        public string Servername { get; private set; }
-        public string Nick { get; private set; }
+        public string ServernameOrNick { get; private set; }
     }
 
     public class User

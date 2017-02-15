@@ -7,8 +7,7 @@ namespace VmDoom.IRCd.UnitTests
     public class UnitTest1
     {
         // <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
-        // <prefix>   ::= <servername> | <nick> [ '!' <user> ]
-        //    [ '@' <host> ]
+        // <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
         // command is either 0 or more letters or 3 numbers seperated by spaces
         // <command>  ::= <letter> { <letter> } | <number> <number> <number>
         // <SPACE>    ::= ' ' { ' ' }
