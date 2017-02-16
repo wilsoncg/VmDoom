@@ -47,7 +47,7 @@ namespace VmDoom.IRCd.UnitTests
             var input = "NICK nickname";
             var message = new Parser().TryParse(input);
 
-            Assert.AreEqual("nick", message.Command);
+            Assert.AreEqual(Command.Nick, message.Command);
             Assert.AreEqual("nickname", message.User.Nickname);
         }
 
@@ -57,7 +57,7 @@ namespace VmDoom.IRCd.UnitTests
             var input = ":nickname NICK newnickname";
             var message = new Parser().TryParse(input);
 
-            Assert.AreEqual("changenick", message.Command);
+            Assert.AreEqual(Command.Nick, message.Command);
             Assert.AreEqual("newnickname", message.Newnick.New);
             Assert.AreEqual("nickname", message.Newnick.Old);
         }

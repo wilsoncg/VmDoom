@@ -23,7 +23,7 @@ namespace VmDoom.IRCd
         {
         }
 
-        public string Command { get; set; }
+        public Command Command { get; set; }
 
         public User User { get; private set; }
         
@@ -83,13 +83,14 @@ namespace VmDoom.IRCd
             //        .Return(new MapCommand(textCommand).Command)
 
             Parser<Command> command =
-                numCommand.Return(Command.Unknown)
-                .Or(new MapCommand(textCommand).Command)
-                
+                numCommand
+                .Or(textCommand)
+                .Select(x => new MapCommand(x).Command);                
 
             return new IrcMessage
             {
-                Prefix = prefix.Parse(input)
+                Prefix = prefix.Parse(input),
+                Command = command.Parse(input)
             };
         }
     }
