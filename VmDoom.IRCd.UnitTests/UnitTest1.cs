@@ -61,10 +61,11 @@ namespace VmDoom.IRCd.UnitTests
             var input = ":nickname NICK newnickname";
             var message = new Parser().TryParse(input);
 
+            Assert.IsNotNull(message.Prefix);
             Assert.AreEqual("nickname", message.Prefix.ServernameOrNick);
             Assert.AreEqual(Command.Nick, message.Command);
-            Assert.AreEqual("newnickname", message.Newnick.New);
-            Assert.AreEqual("nickname", message.Newnick.Old);
+            Assert.IsFalse(message.Params.Count == 0);
+            Assert.AreEqual("newnickname", message.Params[0]);
         }
 
         // USER

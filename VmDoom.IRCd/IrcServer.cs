@@ -23,17 +23,16 @@ namespace VmDoom.IRCd
         {
         }
 
+        public Prefix Prefix { get; set; }
+
         public Command Command { get; set; }
 
-        private IList<String> _params = new string[] { };
-        public IList<String> Params
+        private IList<string> _params = new string[] { };
+        public IList<string> Params
         {
             get { return _params; }
+            set { _params = value; }
         }
-        
-        public Newnick Newnick { get; private set; }    
-        
-        public Prefix Prefix { get; set; }
     }
 
     public class MapCommand
@@ -73,54 +72,53 @@ namespace VmDoom.IRCd
             Parser<char> Colon = Parse.Char(':');
 
             Parser<string> serverOrNick =
-                (from letters in Parse.Upper.Many().Text()
+                (from letters in Parse.Letter.Many().Text()
                  select letters).Token();
 
             Parser<Prefix> prefix =
                 (Colon
                     .Then(_ =>
                     (from p in serverOrNick
-                     from space in Parse.WhiteSpace.Once().Text()
                      select new Prefix(p))));
 
-            //Parser<Prefix> prefix =
-            //    Colon.Then(_ => 
-            //        (from s in serverOrNick
-            //         select new Prefix(s)));
-
             Parser<string> numCommand = 
-                Parse.Digit.AtLeastOnce().Text().Token();
+                Parse.Digit.AtLeastOnce().Text();
             Parser<string> textCommand =
-                Parse.Letter.Many().Text().Token();
-
-            //Parser<Command> command =
-            //    prefix
-            //    .Then(p => Parse.Return(Command.Unknown))
-            //        .Return(numCommand)
-            //    .Or(_ => textCommand)
-            //        .Return(new MapCommand(textCommand).Command)
+                Parse.Letter.Many().Text();
 
             Parser<Command> command =
                 numCommand
                 .Or(textCommand)
                 .Select(x => new MapCommand(x).Command);
 
+            Parser<string> mparam =
+                Parse.AnyChar.Many().Text().Token();
+
+            Parser<List<String>> mparams =
+                mparam.Many().Select(mp => mp.ToList());
+
             var m = new IrcMessage();
             Parser<IrcMessage> message =
                 (from c in command
-                 select new IrcMessage { Command = c })
+                 from space in Parse.WhiteSpace.Once().Text()
+                 from mps in mparams
+                 select new IrcMessage { Command = c, Params = mps })
                  .Or
-                (from p in prefix
-                 from c in command
-                 select new IrcMessage { Prefix = p, Command = c });
-            //.Then(_ => command);
+                 (from p in prefix
+                  from c in command
+                  from space in Parse.WhiteSpace.Once().Text()
+                  from mps in mparams
+                  select new IrcMessage { Prefix = p, Command = c, Params = mps });
+
+            //(prefix.Then(p => command).Then(c => mparams)
+            //    .Return(
+            //        (p, c, mparams) => 
+            //        { m.Prefix = p; m.Command = c; m.Params = mparams; }
+            //    ));
+                 //from c in command
+                 //select (Prefix p, Command c) => { m.Prefix = p; m.Command = c; });
 
             return message.Parse(input);
-            //return new IrcMessage
-            //{
-            //    Prefix = prefix.Parse(input),
-            //    Command = command.Parse(input)
-            //};
         }
     }
 
