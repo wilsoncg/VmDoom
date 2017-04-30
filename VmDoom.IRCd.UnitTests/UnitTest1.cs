@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VmDoom.IRCd.Message;
 
 namespace VmDoom.IRCd.UnitTests
 {
@@ -87,7 +88,7 @@ namespace VmDoom.IRCd.UnitTests
             Assert.AreEqual("~username", message.Params[0]);
             Assert.AreEqual("host", message.Params[1]);
             Assert.AreEqual("server", message.Params[2]);
-            Assert.AreEqual("realname", message.Params[3]);
+            Assert.AreEqual(":realname", message.Params[3]);
         }
     }
 }

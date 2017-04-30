@@ -58,14 +58,14 @@
   <ItemGroup>
     <Compile Include="IrcServer.cs" />
     <Compile Include="IrcSocket.cs" />
+    <Compile Include="Message\IrcMessage.cs" />
+    <Compile Include="Message\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Message\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
