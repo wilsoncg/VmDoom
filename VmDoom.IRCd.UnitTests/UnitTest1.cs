@@ -41,22 +41,27 @@ namespace VmDoom.IRCd.UnitTests
         // ERR_ERRONEUSNICKNAME
         // ERR_NICKNAMEINUSE 
         // ERR_NICKCOLLISION
+
         [TestMethod]
-        public void ParseNick()
+        public void MessageIsNickCommand()
         {
             var input = "NICK nickname";
             var message = new Parser().TryParse(input);
 
+            Assert.IsNull(message.Prefix);
             Assert.AreEqual(Command.Nick, message.Command);
-            Assert.AreEqual("nickname", message.User.Nickname);
+            Assert.IsNotNull(message.Params);
+            Assert.IsFalse(message.Params.Count == 0);
+            Assert.AreEqual("nickname", message.Params[0]);
         }
 
         [TestMethod]
-        public void ParseNickChange()
+        public void MessageIsPrefixWithNickCommand()
         {
             var input = ":nickname NICK newnickname";
             var message = new Parser().TryParse(input);
 
+            Assert.AreEqual("nickname", message.Prefix.ServernameOrNick);
             Assert.AreEqual(Command.Nick, message.Command);
             Assert.AreEqual("newnickname", message.Newnick.New);
             Assert.AreEqual("nickname", message.Newnick.Old);
@@ -70,18 +75,18 @@ namespace VmDoom.IRCd.UnitTests
         // ERR_NEEDMOREPARAMS 461 
         // ERR_ALREADYREGISTRED 462
         [TestMethod]
-        public void ParseUser()
+        public void MessageIsUserCommand()
         {
             var input = "USER ~username host server :realname";
             var userToString = "!~username@host";
             var message = new Parser().TryParse(input);
-            var user = message.User;
 
-            Assert.AreEqual("~username", user.Username);
-            Assert.AreEqual("host", user.Host);
-            Assert.AreEqual("realname", user.Realname);
-            Assert.AreEqual("user", message.Command);
-            Assert.AreEqual(userToString, message.User.ToString());
+            Assert.AreEqual(Command.User, message.Command);
+            Assert.IsTrue(message.Params.Count == 4);
+            Assert.AreEqual("~username", message.Params[0]);
+            Assert.AreEqual("host", message.Params[1]);
+            Assert.AreEqual("server", message.Params[2]);
+            Assert.AreEqual("realname", message.Params[3]);
         }
     }
 }

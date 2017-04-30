@@ -25,7 +25,11 @@ namespace VmDoom.IRCd
 
         public Command Command { get; set; }
 
-        public User User { get; private set; }
+        private IList<String> _params = new string[] { };
+        public IList<String> Params
+        {
+            get { return _params; }
+        }
         
         public Newnick Newnick { get; private set; }    
         
@@ -38,6 +42,8 @@ namespace VmDoom.IRCd
         {
             if (command.ToUpper() == "NICK")
                 Command = Command.Nick;
+            if (command.ToUpper() == "USER")
+                Command = Command.User;
         }
 
         public Command Command { get; private set; }
@@ -46,29 +52,41 @@ namespace VmDoom.IRCd
     public enum Command
     {
         Unknown,
-        Nick
+        Nick,
+        User
     }
 
     public class Parser
     {
         public IrcMessage TryParse(string input)
         {
-            //Parser<string> servername = 
-            //    Parse.Letter.AtLeastOnce().Text().Token();
-
-            //Parser<string> nick =
-            //    Parse.Letter.AtLeastOnce().Text().Token();
+            Parser<Char> special = 
+                Parse.Char('-')
+                .Or(Parse.Char('['))
+                .Or(Parse.Char(']'))
+                .Or(Parse.Char('\\'))
+                .Or(Parse.Char('^'))
+                .Or(Parse.Char('`'))
+                .Or(Parse.Char('{'))
+                .Or(Parse.Char('}'));
 
             Parser<char> Colon = Parse.Char(':');
 
             Parser<string> serverOrNick =
-                (from letters in Parse.Letter.Many().Text()
+                (from letters in Parse.Upper.Many().Text()
                  select letters).Token();
 
             Parser<Prefix> prefix =
-                Colon.Then(_ => 
-                    (from s in serverOrNick
-                     select new Prefix(s)));
+                (Colon
+                    .Then(_ =>
+                    (from p in serverOrNick
+                     from space in Parse.WhiteSpace.Once().Text()
+                     select new Prefix(p))));
+
+            //Parser<Prefix> prefix =
+            //    Colon.Then(_ => 
+            //        (from s in serverOrNick
+            //         select new Prefix(s)));
 
             Parser<string> numCommand = 
                 Parse.Digit.AtLeastOnce().Text().Token();
@@ -85,13 +103,24 @@ namespace VmDoom.IRCd
             Parser<Command> command =
                 numCommand
                 .Or(textCommand)
-                .Select(x => new MapCommand(x).Command);                
+                .Select(x => new MapCommand(x).Command);
 
-            return new IrcMessage
-            {
-                Prefix = prefix.Parse(input),
-                Command = command.Parse(input)
-            };
+            var m = new IrcMessage();
+            Parser<IrcMessage> message =
+                (from c in command
+                 select new IrcMessage { Command = c })
+                 .Or
+                (from p in prefix
+                 from c in command
+                 select new IrcMessage { Prefix = p, Command = c });
+            //.Then(_ => command);
+
+            return message.Parse(input);
+            //return new IrcMessage
+            //{
+            //    Prefix = prefix.Parse(input),
+            //    Command = command.Parse(input)
+            //};
         }
     }
 
