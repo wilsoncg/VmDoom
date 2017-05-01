@@ -13,7 +13,12 @@ namespace VmDoom.IRCd
     {
         public IrcServer()
         {
-            Receive<IrcMessage>(m => { return; });
+            Receive<string>(m => 
+            {
+                var parsed = new Parser().TryParse(m);
+                //var reply = parsed;
+                Sender.Tell("Welcome", Self);
+            });
         }
     }  
 

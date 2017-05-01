@@ -5,7 +5,7 @@ using VmDoom.IRCd.Message;
 namespace VmDoom.IRCd.UnitTests
 {
     [TestClass]
-    public class UnitTest1
+    public class ParserTests
     {
         // <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
         // <prefix>   ::= <servername> | <nick> [ '!' <user> ] [ '@' <host> ]
@@ -88,7 +88,31 @@ namespace VmDoom.IRCd.UnitTests
             Assert.AreEqual("~username", message.Params[0]);
             Assert.AreEqual("host", message.Params[1]);
             Assert.AreEqual("server", message.Params[2]);
-            Assert.AreEqual(":realname", message.Params[3]);
+            Assert.AreEqual("realname", message.Params[3]);
+        }
+
+        [TestMethod]
+        public void MessageIsUserCommandWithSpaceInRealname()
+        {
+            var input = "USER ~username host server :real name";
+            var userToString = "!~username@host";
+            var message = new Parser().TryParse(input);
+
+            Assert.AreEqual(Command.User, message.Command);
+            Assert.IsTrue(message.Params.Count == 4);
+            Assert.AreEqual("~username", message.Params[0]);
+            Assert.AreEqual("host", message.Params[1]);
+            Assert.AreEqual("server", message.Params[2]);
+            Assert.AreEqual("real name", message.Params[3]);
+        }
+
+        [TestMethod]
+        public void ActualConnectMessage()
+        {
+            // CAP LS 302
+            // capability notification
+            // http://ircv3.net/specs/extensions/cap-notify-3.2.html
+            var input = "CAP LS 302\r\nNICK craig\r\nUSER craig craig localhost :realname\r\n";
         }
     }
 }

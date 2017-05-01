@@ -56,7 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IrcServer.cs" />
+    <Compile Include="IrcReceiver.cs" />
     <Compile Include="IrcSocket.cs" />
     <Compile Include="Message\IrcMessage.cs" />
     <Compile Include="Message\Parser.cs" />

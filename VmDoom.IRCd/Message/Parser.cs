@@ -42,7 +42,8 @@ namespace VmDoom.IRCd.Message
                 .Select(x => new MapCommand(x).Command);
 
             Parser<string> mparam =
-                Parse.CharExcept(' ').Many().Text();
+                Colon.Then(_ => Parse.AnyChar.Many().Text())
+                .Or(Parse.CharExcept(' ').Many().Text());
 
             Parser<IEnumerable<string>> mparams =
                 (mparam.Token()).Many();
